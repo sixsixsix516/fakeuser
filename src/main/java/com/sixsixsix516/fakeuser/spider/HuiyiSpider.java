@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * 用于爬取头像
+ *
  * https://www.huiyi8.com/tx/ 爬虫
  *
  * @author sun 2019/12/28 18:36
