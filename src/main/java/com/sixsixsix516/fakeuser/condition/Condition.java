@@ -5,6 +5,8 @@ package com.sixsixsix516.fakeuser.condition;
  */
 public class Condition {
 
+
+
    public static Object Equal(Object value) {
         return value;
     }

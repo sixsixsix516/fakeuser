@@ -1,8 +1,11 @@
 package com.sixsixsix516.fakeuser.spider;
 
 import com.sixsixsix516.fakeuser.FakeuserApplication;
+import com.sixsixsix516.fakeuser.condition.IntegerCodition;
+import com.sixsixsix516.fakeuser.condition.StringCondition;
 import com.sixsixsix516.fakeuser.constant.SpiderConstant;
 import com.sixsixsix516.fakeuser.pipeline.OicqPipeline;
+import com.sixsixsix516.fakeuser.wrapper.UsernameWrapper;
 import lombok.Data;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,9 +32,52 @@ public class OicqSpider implements PageProcessor {
     private List<String> data;
     private Spider spider;
 
-    public OicqSpider(Integer count) {
+    private String format;
+
+    private StringCondition usernameCondition;
+
+    public OicqSpider(Integer count, UsernameWrapper usernameCondition) {
         this.count = count;
-        data = new ArrayList<>(count);
+        this.usernameCondition = usernameCondition;
+        this.format = usernameCondition.getFormat();
+        usernameCondition.setNikenameList(new ArrayList<>(count));
+        data = usernameCondition.getNikenameList();
+    }
+
+    /**
+     * 处理生成条件
+     *
+     * @param stringCondition
+     */
+    private void handlerStringCondition(StringCondition stringCondition) {
+        format = stringCondition.getFormat();
+    }
+
+    /**
+     * 检验数据是否合法
+     *
+     * @return
+     */
+    public boolean check(String username) {
+        IntegerCodition length = usernameCondition.getLength();
+        if (length != null) {
+            // 当条件有值的时候才判断
+            if (length.getEq() != null) {
+                // 如果eq有值则判断eq
+                return length.getEq() == username.length() ? true : false;
+            }
+            if (length.getGt() != null) {
+                if (length.getGt() >= username.length()) {
+                    return false;
+                }
+            }
+            if (length.getLt() != null) {
+                if (length.getLt() <= username.length()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -53,11 +99,18 @@ public class OicqSpider implements PageProcessor {
             // 2.1 获取当前页的数据
             List<String> all = html.xpath("//div[@class='listfix']//p/text()").all();
             // 2.2 添加下一页
-            if (data.size() < count) {
-                data.addAll(all);
-            } else {
-                spider.stop();
+            for (int i = 0, len = all.size(); i < len; i++) {
+                String username = all.get(i);
+                if (data.size() < count) {
+                    // 当数据合法时才使用
+                    if (check(username)) {
+                        data.add(String.format(format, username));
+                    }
+                } else {
+                    spider.stop();
+                }
             }
+
         } else {
             // 发生错误
         }
