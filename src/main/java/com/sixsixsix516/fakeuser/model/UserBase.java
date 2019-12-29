@@ -15,7 +15,7 @@ public class UserBase {
     /**
      * 昵称
      */
-    private String nikename;
+    private Object nikename;
 
     /**
      * 真实姓名

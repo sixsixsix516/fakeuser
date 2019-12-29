@@ -7,6 +7,7 @@ import com.sixsixsix516.fakeuser.spider.OicqSpider;
 import lombok.Builder;
 import us.codecraft.webmagic.Spider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ public class FakeUser {
      * 生成的数量
      */
     private Integer num;
+
+    public UserBase userbase;
 
     /**
      * 网名列表
@@ -55,9 +58,8 @@ public class FakeUser {
                 .addPipeline(new OicqPipeline())
                 .thread(1)
                 .run();
-
-
-        return oicqSpider.getData();
+        usernameList = oicqSpider.getData();
+        return usernameList;
     }
 
     /**
@@ -70,9 +72,16 @@ public class FakeUser {
     }
 
 
-    public List get() {
+    public List<UserBase> get() {
         check();
-        usernameList =  fillUsername(num);
-        return usernameList;
+        List<UserBase> result =  new ArrayList<>(num);
+        fillUsername(num);
+        for (int i = 0; i < num; i++) {
+            UserBase userBase = new UserBase();
+            userBase.setNikename(usernameList.get(i));
+            result.add(userBase);
+        }
+
+        return result;
     }
 }
