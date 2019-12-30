@@ -2,9 +2,10 @@ package com.sixsixsix516.fakeuser.start;
 
 import com.sixsixsix516.fakeuser.constant.SpiderConstant;
 import com.sixsixsix516.fakeuser.model.UserBase;
-import com.sixsixsix516.fakeuser.pipeline.OicqPipeline;
+import com.sixsixsix516.fakeuser.sdk.BaiduDwz;
+import com.sixsixsix516.fakeuser.spider.HuiyiSpider;
 import com.sixsixsix516.fakeuser.spider.OicqSpider;
-import com.sixsixsix516.fakeuser.wrapper.UsernameWrapper;
+import com.sixsixsix516.fakeuser.wrapper.StringWrapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import us.codecraft.webmagic.Spider;
@@ -24,68 +25,63 @@ public class FakeUser {
      */
     private Integer num;
 
-
     /**
-     * 头像列表
+     * 用户字段区
      */
-    private List<String> headUrlList;
+    public StringWrapper username;
 
-    public UsernameWrapper username;
+    public StringWrapper headurl;
 
 
     public FakeUser() {
         // 默认获取100条数据
         num = 100;
-        username = new UsernameWrapper();
+        username = new StringWrapper();
+        headurl =  new StringWrapper();
     }
 
-
-    private void check() {
-
-
+    public FakeUser setNum(Integer num) {
+        this.num = num;
+        username.setNum(num);
+        headurl.setNum(num);
+        return this;
     }
 
 
     /**
-     * 填充指定数量的用户名
-     *
-     * @param num
-     * @return
+     * 启动填充数据
      */
-    private List<String> fillUsername(Integer num) {
-        OicqSpider oicqSpider = new OicqSpider(num, username);
-        Spider spider = Spider.create(oicqSpider);
-        oicqSpider.setSpider(spider);
+    public void start() {
 
-        spider.addUrl(SpiderConstant.IOCQHOME)
-                .addPipeline(new OicqPipeline())
-                .thread(1)
-                .run();
+        OicqSpider oicqSpider = new OicqSpider(username);
+        Spider spider1 = Spider.create(oicqSpider);
+        oicqSpider.setSpider(spider1);
+        username.start(spider1, SpiderConstant.IOCQHOME);
 
-        return username.getNikenameList();
-    }
 
-    /**
-     * 填充指定数量的头像
-     *
-     * @return
-     */
-    private List<String> fillHeadUrlList(Integer num) {
-        return null;
+        HuiyiSpider huiyiSpider = new HuiyiSpider(headurl);
+        Spider spider2 = Spider.create(huiyiSpider);
+        huiyiSpider.setSpider(spider2);
+        username.start(spider2, SpiderConstant.HUIYIHOME);
+
     }
 
 
     public List<UserBase> get() {
-        check();
+        // 最后返回的数据
         List<UserBase> result = new ArrayList<>(num);
-        List<String> usernameList = fillUsername(num);
+        start();
+        List<String> nikenameList = username.getStringDataList();
+        List<String> headurlList = headurl.getStringDataList();
 
         for (int i = 0; i < num; i++) {
             UserBase userBase = new UserBase();
-            userBase.setNikename(usernameList.get(i));
+            userBase.setNikename(nikenameList.get(i));
+            userBase.setHeadUrl(BaiduDwz.createShortUrl(headurlList.get(i)));
             result.add(userBase);
         }
 
         return result;
     }
+
 }

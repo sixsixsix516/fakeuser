@@ -10,7 +10,6 @@ import java.util.List;
 @SpringBootApplication
 public class FakeuserApplication {
 
-    public static List<String> name = new ArrayList();
 
     public static void main(String[] args) {
         SpringApplication.run(FakeuserApplication.class, args);

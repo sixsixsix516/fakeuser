@@ -1,7 +1,11 @@
 package com.sixsixsix516.fakeuser.spider;
 
+import com.sixsixsix516.fakeuser.condition.Condition;
 import com.sixsixsix516.fakeuser.constant.SpiderConstant;
 import com.sixsixsix516.fakeuser.pipeline.OicqPipeline;
+import com.sixsixsix516.fakeuser.wrapper.StringWrapper;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
@@ -21,16 +25,39 @@ import java.util.Random;
 
 /**
  * 用于爬取头像
- *
+ * <p>
  * https://www.huiyi8.com/tx/ 爬虫
  *
  * @author sun 2019/12/28 18:36
  */
+@Accessors(chain = true)
+@Data
 public class HuiyiSpider implements PageProcessor {
-
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(100)
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
+
+
+    /*
+     * 生成数据的数量
+     */
+    private Integer count;
+
+    /**
+     * 当前spider对象 用于停止爬虫
+     */
+    private Spider spider;
+
+    /**
+     * 用户名的条件对象
+     */
+    private StringWrapper headurlCondition;
+
+
+    public HuiyiSpider(StringWrapper headurlWrapper) {
+        this.headurlCondition = headurlWrapper;
+        this.count = headurlWrapper.getNum();
+    }
 
 
     @Override
@@ -41,11 +68,28 @@ public class HuiyiSpider implements PageProcessor {
         // 1.处理首页
         if (SpiderConstant.HUIYIHOME.equals(url.get())) {
             List<String> all = html.xpath("//ul[@class='search-result-box clearfix']//img//@src").all();
-            all.forEach(this::download);
+            for (int i = 0; i < all.size(); i++) {
+                String username = all.get(i);
+                List<String> nikenameList = headurlCondition.getStringDataList();
+                if (nikenameList.size() < count) {
+                    // 当数据合法时才使用
+                    if (headurlCondition.check(username)) {
+                        List<Condition> conditionList = headurlCondition.getConditionList();
+                        Object modifyUsername = username;
+                        for (Condition condition : conditionList) {
+                            modifyUsername = condition.modify(modifyUsername);
+                        }
+                        nikenameList.add((String) modifyUsername);
+                    }
+                } else {
+                    spider.stop();
+                }
+            }
+
         }
     }
 
-    public void download(String urlString) {
+/*    public void download(String urlString) {
         try {
 
             // 构造URL
@@ -69,17 +113,12 @@ public class HuiyiSpider implements PageProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public Site getSite() {
         return site;
     }
 
-    public static void main(String[] args) {
-        Spider.create(new HuiyiSpider())
-                .addUrl(SpiderConstant.HUIYIHOME)
-                .thread(1)
-                .run();
-    }
+
 }
