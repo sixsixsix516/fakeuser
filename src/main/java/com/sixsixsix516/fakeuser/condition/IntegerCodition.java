@@ -24,9 +24,6 @@ public class IntegerCodition implements Condition {
         this.stringWrapper = stringWrapper;
     }
 
-    public StringWrapper and(){
-        return stringWrapper;
-    }
 
 
     /**
@@ -48,7 +45,6 @@ public class IntegerCodition implements Condition {
      * 对对象中的条件进行解析
      *
      * @param data 需要校验的数据
-     * @return
      */
     @Override
     public boolean check(Object data) {

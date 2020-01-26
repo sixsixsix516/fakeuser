@@ -17,51 +17,9 @@ import java.io.InputStreamReader;
  */
 public class BaiduDwz {
 
-    final static String CREATE_API = "https://dwz.cn/admin/v2/create";
-    final static String TOKEN = "9cdcb584ae6870d731be851767239fa5";
+    private final static String CREATE_API = "https://dwz.cn/admin/v2/create";
+    private final static String TOKEN = "9cdcb584ae6870d731be851767239fa5";
 
-    class UrlResponse {
-
-        private int code;
-
-        private String errMsg;
-
-        private String longUrl;
-
-        private String shortUrl;
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getErrMsg() {
-            return errMsg;
-        }
-
-        public void setErrMsg(String errMsg) {
-            this.errMsg = errMsg;
-        }
-
-        public String getLongUrl() {
-            return longUrl;
-        }
-
-        public void setLongUrl(String longUrl) {
-            this.longUrl = longUrl;
-        }
-
-        public String getShortUrl() {
-            return shortUrl;
-        }
-
-        public void setShortUrl(String shortUrl) {
-            this.shortUrl = shortUrl;
-        }
-    }
 
     /**
      * 创建短网址

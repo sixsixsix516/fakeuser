@@ -24,12 +24,12 @@ public class StringWrapper {
     private Integer num;
 
     /**
-     * 网名列表, 存储生成的数据
+     * 存储生成的数据
      */
     private List<String> stringDataList;
 
     /**
-     * 用户名的条件列表
+     * 存储条件
      */
     private List<Condition> conditionList;
 
@@ -72,7 +72,7 @@ public class StringWrapper {
      */
     public void start(Spider spider, String url) {
         spider.addUrl(url)
-                .thread(1)
+                .thread(3)
                 .run();
     }
 

@@ -12,15 +12,17 @@ public class FakeuserApplicationTests {
 
         FakeUser fakeUser = new FakeUser();
         fakeUser.setNum(10);
+        // 对用户的限制
         fakeUser.username
                 .addStringCondition().format("SX_%s").and()
                 .addIntegerCodition().gt(3).lt(5);
 
 
         List<UserBase> userBases = fakeUser.get();
-        System.out.println("--------------------------------------------------");
-        userBases.stream().forEach(System.out::println);
-        System.out.println("--------------------------------------------------");
+        System.out.println("=================================================================================");
+        userBases.stream().forEach(System.err::println);
+        System.out.println("=================================================================================");
+
 
 
     }

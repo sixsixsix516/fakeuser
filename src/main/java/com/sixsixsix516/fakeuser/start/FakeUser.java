@@ -5,6 +5,7 @@ import com.sixsixsix516.fakeuser.model.UserBase;
 import com.sixsixsix516.fakeuser.sdk.BaiduDwz;
 import com.sixsixsix516.fakeuser.spider.HuiyiSpider;
 import com.sixsixsix516.fakeuser.spider.OicqSpider;
+import com.sixsixsix516.fakeuser.wrapper.RealnameWrapper;
 import com.sixsixsix516.fakeuser.wrapper.StringWrapper;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -30,7 +31,15 @@ public class FakeUser {
      */
     public StringWrapper username;
 
+    /**
+     * 头像
+     */
     public StringWrapper headurl;
+
+    /**
+     * 真实姓名
+     */
+    private RealnameWrapper realname;
 
 
     public FakeUser() {
@@ -38,6 +47,7 @@ public class FakeUser {
         num = 100;
         username = new StringWrapper();
         headurl =  new StringWrapper();
+        realname = new RealnameWrapper();
     }
 
     public FakeUser setNum(Integer num) {
@@ -53,34 +63,44 @@ public class FakeUser {
      */
     public void start() {
 
+        // 1.用户昵称爬虫
         OicqSpider oicqSpider = new OicqSpider(username);
         Spider spider1 = Spider.create(oicqSpider);
         oicqSpider.setSpider(spider1);
         username.start(spider1, SpiderConstant.IOCQHOME);
 
-
+        // 2.头像爬虫
         HuiyiSpider huiyiSpider = new HuiyiSpider(headurl);
         Spider spider2 = Spider.create(huiyiSpider);
         huiyiSpider.setSpider(spider2);
         username.start(spider2, SpiderConstant.HUIYIHOME);
 
+        // 3.用户真实姓名填充
+
+
     }
 
 
     public List<UserBase> get() {
-        // 最后返回的数据
-        List<UserBase> result = new ArrayList<>(num);
+        // 开始填充数据
         start();
+        // 获取数据
+        // 昵称
         List<String> nikenameList = username.getStringDataList();
+        // 头像
         List<String> headurlList = headurl.getStringDataList();
+        // 真实用户名
+        List<String> realnameList = realname.getRealnameList(num);
 
+        //  组装数据
+        List<UserBase> result = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
             UserBase userBase = new UserBase();
             userBase.setNikename(nikenameList.get(i));
             userBase.setHeadUrl(BaiduDwz.createShortUrl(headurlList.get(i)));
+            userBase.setRealname(realnameList.get(i));
             result.add(userBase);
         }
-
         return result;
     }
 
