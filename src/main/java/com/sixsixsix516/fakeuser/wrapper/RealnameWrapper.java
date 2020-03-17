@@ -23,8 +23,8 @@ public class RealnameWrapper {
      */
     private List<String> data;
 
-    private String[] firstName = Constant.firstName;
-    private String[] lastName = Constant.lastName;
+    private String[] firstName = Constant.FIRST_NAME;
+    private String[] lastName = Constant.LAST_NAME;
 
     /**
      * 条件列表
@@ -34,10 +34,9 @@ public class RealnameWrapper {
     public RealnameWrapper() {
         conditionList = new ArrayList<>();
         data = new ArrayList<>();
-
     }
 
-    public List<String> getRealnameList(Integer num) {
+    public void start(Integer num){
         for (int i = 0; i < num; i++) {
             int firstNameRandomNum = random.nextInt(firstName.length - 1);
             // 获取姓
@@ -56,6 +55,9 @@ public class RealnameWrapper {
 
             data.add(realname);
         }
+    }
+
+    public List<String> getRealnameList() {
         return data;
     }
 

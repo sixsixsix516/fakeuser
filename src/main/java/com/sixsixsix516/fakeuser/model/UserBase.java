@@ -25,7 +25,7 @@ public class UserBase {
     /**
      * 用户编号
      */
-    private Integer userNo;
+    private Long userNo;
 
     /**
      * 生日
